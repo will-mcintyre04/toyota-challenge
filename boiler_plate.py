@@ -4,7 +4,10 @@ import TMMC_Wrapper
 import rclpy
 import numpy as np
 import math
-import time
+import modules.safety_features
+
+# Constant for angle range from center
+VIEWING_ANGLE_RANGE = 90
 
 #Start ros with initializing the rclpy object
 if not rclpy.ok():
@@ -22,53 +25,40 @@ if not "robot" in globals():
 print("running main")
 
 #start processes
-robot.start_keyboard_control()
+robot.start_keyboard_control() 
 #add starter functions here
 
 #rclpy,spin_once is a function that updates the ros topics once
 rclpy.spin_once(robot, timeout_sec=0.1)
 
+# Function to find the minimum distance within the desired angle range (from center)
+def find_min_distance_in_view(scan, angle):
+    
+    # Slice the ranges array to get the desired segment
+    ranges = scan.ranges
+    segment = ranges[:int(angle/2) + 1] + ranges[int(-angle/2):]
+    
+    # Find the minimum distance in the segment
+    min_distance = min(segment)
+    
+    return min_distance
+
 #run control functions on loop
 try:
-    print("Entering the robot loop which cycles until the srcipt is stopped")
-    while True:
-
-        #rclpy,spin_once is a function that updates the ros topics once
+    print("Entering the robot loop which cycles until the script is stopped")
+    while(True):
+        # Spin once to update the ROS topics
         rclpy.spin_once(robot, timeout_sec=0.1)
 
+        # Get the LIDAR scan data
         scan = robot.checkScan()
-        print(scan)
-        print(robot.detect_obstacle(scan))
 
-        #Add looping functionality here
-        if robot.detect_obstacle(scan) != (-1, -1):
-            print("too close")
-            start_time = time.time()
-            while time.time() - start_time < 2:
-                robot.send_cmd_vel(0.0, 0.0)
-            robot.keyboard_listener.stop()
-            print("Stop loop ended") 
-
-            # Get the current time
-            start_time = time.time()
-
-            print("looping")
-            # Loop for 2 seconds
-            while time.time() - start_time < 3:
-                robot.move_backward()
-
-            print("Back Loop has ended.")  
-
-            start_time = time.time()
-            while time.time() - start_time < 2:
-                robot.send_cmd_vel(0.0, 0.0)   
-
-            print("Stop loop ended") 
-
-            robot.keyboard_listener.stop()                                                                      
-
-        # If UNSAFE (lidar detects close objecs)
-            # do something that stops the listener and then go to newmans function then start the listener again
+        # Ensure scan data is valid
+        if scan is not None and hasattr(scan, 'ranges'):
+            min_distance = find_min_distance_in_view(scan, VIEWING_ANGLE_RANGE)
+            print(min_distance)
+            if(min_distance < 0.2):
+                modules.safety_features.stop_backup(robot)
         
 except KeyboardInterrupt:
     print("keyboard interrupt receieved.Stopping...")
@@ -77,3 +67,5 @@ finally:
     #add functionality to ending processes here
     robot.destroy_node()
     rclpy.shutdown()
+
+
