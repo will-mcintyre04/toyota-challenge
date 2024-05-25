@@ -46,7 +46,7 @@ from ultralytics import YOLO
 CONST_speed_control = 1 #set this to 1 for full speed, 0.5 for half speed
 DEBUG = False #set to false to disable terminal printing of some functions
 
-is_SIM = False #to disable some functions that can not be used on the sim
+is_SIM = True #to disable some functions that can not be used on the sim
 
 #not sure if we need , modify later, seems like an init thing
 def use_hardware():
@@ -453,6 +453,9 @@ class Robot(Node):
         else:
             print("Keyboard listener already running")
 
+    def endKeyboardListener(self):
+        self.keyboard_listener.stop()
+
     def stop_keyboard_control(self):
         if self.keyboard_listener is not None:
             self.keyboard_listener.stop()
@@ -518,7 +521,8 @@ class Robot(Node):
         obstacle_dist = 0.3
 
         # read lidar scan and extract data in angle range of interest
-        data = scan[front_right_index:front_left_index + 1]
+        ranges = scan.ranges  # Access the ranges attribute which is a list
+        data = ranges[front_right_index:front_left_index + 1]  # Slice the list as needed
 
         min_dist = min(data)
         min_dist_index = data.index(min_dist)
