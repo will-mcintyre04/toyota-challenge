@@ -10,6 +10,11 @@ To run the simulation:
 2. `./install_sim_files.sh`
 3. `ros2 launch turtlebot_tic_world.launch.py`
 
+To run the control code in the simulation:
+1. `cd tmmc_fleet_control_challenge`
+2. Update `solution-joystick.py` to be 
+3. `python3 solution-joystick.py` 
+
 Note: if you want to use a TurtleBot with a camera, please type `export TURTLEBOT3_MODEL=waffle_pi` in your terminal before running step 3 above. By default the environment variable `TURTLEBOT3_MODEL` is set to `burger` which only has a LiDAR.
 
 You should see a TurtleBot 3 model spawned in the Gazebo simulator along with a model of the Toyota Innovation Challenge field setup. You can use the TMMC_Wrapper to interface with this simulated robot.
