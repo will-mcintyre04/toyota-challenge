@@ -46,7 +46,7 @@ from ultralytics import YOLO
 CONST_speed_control = 1 #set this to 1 for full speed, 0.5 for half speed
 DEBUG = False #set to false to disable terminal printing of some functions
 
-is_SIM = False #to disable some functions that can not be used on the sim
+is_SIM = True #to disable some functions that can not be used on the sim
 
 #not sure if we need , modify later, seems like an init thing
 def use_hardware():
@@ -498,17 +498,16 @@ class Robot(Node):
         except:
             pass
 
-    def move_distance(self, d):
-        self.reset_odometry()
+    def move_distance(self, d: float):
+        vel = 1.5  # m/s
+        init_time = time.perf_counter()
         if d > 0:
             self.move_forward()
         else:
             self.move_backward()
 
         while True:
-            self.odom_future = rclpy.Future()
-            pose = self.spin_until_future_complete(self.odom_future).pose.pose
-            if numpy.linalg.norm([pose.position.x,pose.position.y,pose.position.z]) > d:
+            if vel * (time.perf_counter() - init_time)-0.5 > abs(d):
                 break
         self.stop()
 
