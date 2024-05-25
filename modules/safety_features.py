@@ -8,7 +8,7 @@ def stop_backup(robot: rb):
         robot.keyboard_listener.stop()
 
     robot.stop()
-    time.sleep(1)
+    time.sleep(0.5)
     robot.move_distance(-__backup_dist)
 
     if robot.keyboard_listener is not None:
