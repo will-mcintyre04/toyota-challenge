@@ -1,9 +1,15 @@
 from TMMC_Wrapper import Robot as rb
+import time
 
-backup_dist = 0.25  # in metres
+__backup_dist = 0.33  # in metres
 
-def stop_backup(robot: rb, ):
-    robot.keyboard_listener.stop()
+def stop_backup(robot: rb):
+    if robot.keyboard_listener is not None:
+        robot.keyboard_listener.stop()
+
     robot.stop()
-    robot.move_distance(backup_dist)
-    robot.keyboard_listener.start()
+    time.sleep(1)
+    robot.move_distance(-__backup_dist)
+
+    if robot.keyboard_listener is not None:
+        robot.keyboard_listener.start()
