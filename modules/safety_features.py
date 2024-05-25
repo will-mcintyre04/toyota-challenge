@@ -12,4 +12,4 @@ def stop_backup(robot: rb):
     robot.move_distance(-__backup_dist)
 
     if robot.keyboard_listener is not None:
-        robot.keyboard_listener.start()
+        robot.keyboard_listener.run()

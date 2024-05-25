@@ -539,8 +539,8 @@ class Robot(Node):
         meas = scan.ranges[ind_start:ind_end]
         total = len(meas)
         meas = [m for m in meas if np.isfinite(m)]
-        print(meas)
-        print(len(meas))
+        # print(meas)
+        # print(len(meas))
         if len(meas) == 0:
             return 0.0
         num_too_close = 0.0
