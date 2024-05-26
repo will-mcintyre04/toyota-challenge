@@ -1,10 +1,12 @@
 #Start with imports, ie: import the wrapper
 #import other libraries as needed
 import TMMC_Wrapper
+import modules.safety_features
 import rclpy
 import numpy as np
 import math
 import time
+import modules
 
 # Function to find the minimum distance within the desired angle range (from center)
 def find_min_distance_in_view(scan, angle):
@@ -65,6 +67,7 @@ print("running main")
 #start processes
 robot.start_keyboard_control() 
 #add starter functions here
+robot.start_keyboard_control() 
 
 #rclpy,spin_once is a function that updates the ros topics once
 rclpy.spin_once(robot, timeout_sec=0.1)

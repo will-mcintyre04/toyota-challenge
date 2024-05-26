@@ -17,7 +17,6 @@ def detect_stopsign_april(robot: rb):
         image.display_img(img)
         return robot.detect_april_tag_from_img(img)
 
-
 def detect_stopsign_ml(robot: rb):
     
     img = image.get_viewport(robot)
@@ -36,3 +35,4 @@ def detect_stopsign_red(robot: rb):
     if img is not None:
         img = robot.red_filter(img)
         image.display_img(img)
+
