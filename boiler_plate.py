@@ -65,7 +65,7 @@ if not "robot" in globals():
 print("running main")
 
 #start processes
-robot.start_keyboard_control() 
+
 #add starter functions here
 robot.start_keyboard_control() 
 
