@@ -500,8 +500,11 @@ class Robot(Node):
         except:
             pass
         
-    def stop(self):
+    def stop(self, wait=0.5):
+        self.stop_keyboard_control()
         self.send_cmd_vel(0.0, 0.0)
+        time.sleep(wait)
+        self.start_keyboard_control()
 
     def move_distance(self, d: float):
         vel = 1.5  # m/s
