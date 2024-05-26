@@ -10,25 +10,19 @@ from modules import image
 __backup_dist = 0.33  # in metres
 
 
-
-
 def stop_backup(robot: rb):
-    if robot.keyboard_listener is not None:
-        robot.keyboard_listener.wait()
-
-    robot.stop()
-    time.sleep(0.5)
+    robot.stop_keyboard_control()
+    robot.stop(block_keyboard=False, wait=0.5)
     robot.move_distance(-__backup_dist)
-
-    if robot.keyboard_listener is not None:
-        robot.keyboard_listener.start()
+    robot.start_keyboard_control()
 
 def detect_stopsign_april(robot: rb):
     
     img = image.get_viewport(robot)
     if img is not None:
         image.display_img(img)
-        print(robot.detect_april_tag_from_img(img))
+        return robot.detect_april_tag_from_img(img)
+
 
 def detect_stopsign_ml(robot: rb):
     
@@ -38,6 +32,13 @@ def detect_stopsign_ml(robot: rb):
         ss, x1, x2, y1, y2 = robot.ML_predict_stop_sign(model, img)
 
         if ss:
-            pass
+            print("output")
             cv2.rectangle(img, (x1,x2), (y1,y2), (0,0,255), 2) # mutates ary so don't need to assign
-            image.display_img(img)
+        image.display_img(img)
+
+def detect_stopsign_red(robot: rb):
+
+    img = image.get_viewport(robot)
+    if img is not None:
+        img = robot.red_filter(img)
+        image.display_img(img)

@@ -467,10 +467,8 @@ class Robot(Node):
         if self.keyboard_listener is None:
             def on_press(key):
                 try:
-                    print(f"Key {key.char} pressed")
                     key_char = key.char
                 except AttributeError:
-                    print(f"Special key {key} pressed")
                     key_char = str(key) #---the below cluster of if statements can be removed to make level one more challenging---
                 if key_char == 'w':
                     self.move_forward()
@@ -482,7 +480,6 @@ class Robot(Node):
                     self.turn_right()
             def on_release(key):
                 self.send_cmd_vel(0.0, 0.0)
-                print("Key released and robot stopping.")
             self.keyboard_listener = Listener(on_press=on_press, on_release=on_release)
             self.keyboard_listener.start()
         else:
@@ -516,8 +513,14 @@ class Robot(Node):
                 break
         self.stop()
 
-    def stop(self):
+    def stop(self, block_keyboard=True, wait=1.0):
+        if block_keyboard:
+            self.start_keyboard_control()
         self.send_cmd_vel(0.0, 0.0)
+        if wait is not None:
+            time.sleep(1.0)
+        if block_keyboard:
+            self.start_keyboard_control
 
     def move_forward(self):
         self.send_cmd_vel(1.0*CONST_speed_control, 0.0)
@@ -645,7 +648,7 @@ class Robot(Node):
             """
         # convert image to grayscale
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        cv2.imshow("gray",img_gray)
+        # cv2.imshow("gray",img_gray)
         options = apriltag.DetectorOptions(families="tag16h5, tag25h9")
         # Apriltag detection
         detector = apriltag.Detector(options)
@@ -748,7 +751,7 @@ class Robot(Node):
         #get binary image with OTSU thresholding
         (T, threshInv) = cv2.threshold(blurred, 0, 255,
         cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-        cv2.imshow("Threshold", threshInv)
+        # cv2.imshow("Threshold", threshInv)
         # print("[INFO] otsu's thresholding value: {}".format(T))
     
         #Morphological closing
@@ -816,8 +819,10 @@ class Robot(Node):
         y2 = -1
 
         # Predict stop signs in image using model
-        results = model.predict(img, classes=[11], conf=0.25, imgsz=640, max_det=1, verbose=False)
-        
+        print("start pred")
+        results = model.predict(img, classes=[11], conf=0.25, imgsz=(img.shape[1], img.shape[0]), max_det=1, verbose=False)
+        print("done")
+
         # Results is a list containing the results object with all data
         results_obj = results[0]
         

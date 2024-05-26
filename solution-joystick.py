@@ -6,6 +6,7 @@ import numpy as np
 import math
 from modules import safety_features
 from modules import image
+import time
 
 #start ros
 if not rclpy.ok():
@@ -30,11 +31,59 @@ rclpy.spin_once(robot, timeout_sec=0.1)
 #run the keyboard control functions
 try:
     print("Listening for keyboard events. Press keys to test, Ctrl C to exit")
+
+
+    ss_data = []
+    avgs = {}
+    april_stops = {
+        2:False,
+        3:False
+    }
+
     while True: 
         rclpy.spin_once(robot, timeout_sec=0.1)
         
         # safety_features.detect_stopsign_april(robot)
-        safety_features.detect_stopsign_ml(robot)
+        april_detect = safety_features.detect_stopsign_april(robot)
+        if len(april_detect) > 0:
+            ss_data.append(april_detect)
+        if ss_data.__len__() == 20:
+            avgs.clear()
+            for dic in ss_data:
+                for key in dic:
+                    if key in april_stops:
+                        if key not in avgs:
+                            dist = dic[key][0]
+                            if dist > 1000:
+                                avgs[key] = [None,dic[key][1][0]]
+                            else:
+                                avgs[key] = [dic[key][0],dic[key][1][0]]
+                        else:
+                            if dic[key][0] <= 1000:
+                                if avgs[key][0] == None:
+                                        avgs[key][0] = dic[key][0]
+                                else:
+                                    avgs[key][0] = (dic[key][0] + avgs[key][0]) / 2
+                            avgs[key][1] = (dic[key][1][0] + avgs[key][1]) / 2
+            ss_data.clear()
+            print(avgs)
+        
+        if not (2 in avgs) and april_stops[2]:
+            april_stops[2] = False
+        if not (3 in avgs) and april_stops[3]:
+            april_stops[3] = False
+
+        if 2 in avgs and not april_stops[2]:
+            if avgs[2][0] < 20.0:  # makes no sense just what it reads
+                robot.stop()
+                print("stop")
+                april_stops[2] = True
+        if 3 in avgs and not april_stops[3]:
+            if avgs[3][0] < 115.0:
+                robot.stop()
+                print("stop")
+                april_stops[3] = True
+
 
 except KeyboardInterrupt:
     print("keyboard interrupt receieved.Stopping...")
