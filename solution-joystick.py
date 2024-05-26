@@ -12,7 +12,7 @@ import time
 if not rclpy.ok():
     rclpy.init()
 
-TMMC_Wrapper.is_SIM = False
+TMMC_Wrapper.is_SIM = True
 if not TMMC_Wrapper.is_SIM:
     #specify hardware api
     TMMC_Wrapper.use_hardware()
@@ -32,9 +32,6 @@ rclpy.spin_once(robot, timeout_sec=0.1)
 try:
     print("Listening for keyboard events. Press keys to test, Ctrl C to exit")
 
-
-    ss_data = []
-    avgs = {}
     april_stops = {
         2:False,
         3:False
@@ -43,50 +40,27 @@ try:
     while True: 
         rclpy.spin_once(robot, timeout_sec=0.1)
         
-        # safety_features.detect_stopsign_april(robot)
-        april_detect = safety_features.detect_stopsign_april(robot)
-        # if len(april_detect) > 0:
-        #     ss_data.append(april_detect)
-        # if ss_data.__len__() == 5:
-        #     avgs.clear()
-        #     for dic in ss_data:
-        #         for key in dic:
-        #             if key in april_stops:
-        #                 if key not in avgs:
-        #                     dist = dic[key][0]
-        #                     if dist > 1000:
-        #                         avgs[key] = [None,dic[key][1][0]]
-        #                     else:
-        #                         avgs[key] = [dic[key][0],dic[key][1][0]]
-        #                 else:
-        #                     if dic[key][0] <= 1000:
-        #                         if avgs[key][0] == None:
-        #                                 avgs[key][0] = dic[key][0]
-        #                         else:
-        #                             avgs[key][0] = (dic[key][0] + avgs[key][0]) / 2
-        #                     avgs[key][1] = (dic[key][1][0] + avgs[key][1]) / 2
-        #     ss_data.clear()
-        #     print(avgs)
+        aprils_detected = safety_features.detect_aprils(robot)
         
-        if not (2 in april_detect) and april_stops[2]:
+        if not np.isin(2, aprils_detected) and april_stops[2]:
             april_stops[2] = False
-        if not (3 in april_detect) and april_stops[3]:
+        if not np.isin(3, aprils_detected) and april_stops[3]:
             april_stops[3] = False
 
         scan = robot.checkScan()
         min_distance = safety_features.find_min_distance_in_view(scan, 30, TMMC_Wrapper.is_SIM)
         print("-------------")
-        print(april_detect)
+        print(aprils_detected)
         print(min_distance)
         print(april_stops[2])
         print(april_stops[3])
 
-        if 2 in april_detect and not april_stops[2]:
+        if np.isin(2, aprils_detected) and not april_stops[2]:
             if min_distance < 1.15:
                 robot.stop(wait=2)
                 print("stop")
                 april_stops[2] = True
-        if 3 in april_detect and not april_stops[3]:
+        if np.isin(3, aprils_detected) and not april_stops[3]:
             if min_distance < 1.15:
                 robot.stop(wait=2)
                 print("stop")

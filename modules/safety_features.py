@@ -50,12 +50,16 @@ def backup_until_distance(robot, desired_distance, angle, is_sim):
 
     robot.start_keyboard_control()
 
-def detect_stopsign_april(robot: rb):
+def detect_aprils(robot: rb):
     
     img = image.get_viewport(robot)
     if img is not None:
         image.display_img(img)
-        return robot.detect_april_tag_from_img(img)
+        keys = []
+
+        for key in robot.detect_april_tag_from_img(img):
+            keys.append(key)
+        return keys
 
 def detect_stopsign_ml(robot: rb):
     
@@ -65,7 +69,6 @@ def detect_stopsign_ml(robot: rb):
         ss, x1, x2, y1, y2 = robot.ML_predict_stop_sign(model, img)
 
         if ss:
-            print("output")
             cv2.rectangle(img, (x1,x2), (y1,y2), (0,0,255), 2) # mutates ary so don't need to assign
         image.display_img(img)
 
