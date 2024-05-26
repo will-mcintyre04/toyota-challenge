@@ -1,8 +1,10 @@
 #start with imports, ie: import the wrapper
 import TMMC_Wrapper
+import modules.safety_features
 import rclpy
 import numpy as np
 import math
+from modules import safety_features
 
 #start ros
 if not rclpy.ok():
@@ -29,6 +31,8 @@ try:
     print("Listening for keyboard events. Press keys to test, Ctrl C to exit")
     while True: 
         rclpy.spin_once(robot, timeout_sec=0.1)
+        safety_features.detect_stopsign(robot)
+
 except KeyboardInterrupt:
     print("keyboard interrupt receieved.Stopping...")
 finally:
