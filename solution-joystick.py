@@ -5,6 +5,7 @@ import rclpy
 import numpy as np
 import math
 from modules import safety_features
+from modules import image
 
 #start ros
 if not rclpy.ok():
@@ -31,7 +32,9 @@ try:
     print("Listening for keyboard events. Press keys to test, Ctrl C to exit")
     while True: 
         rclpy.spin_once(robot, timeout_sec=0.1)
-        safety_features.detect_stopsign(robot)
+        
+        # safety_features.detect_stopsign_april(robot)
+        safety_features.detect_stopsign_ml(robot)
 
 except KeyboardInterrupt:
     print("keyboard interrupt receieved.Stopping...")

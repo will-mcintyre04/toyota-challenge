@@ -3,8 +3,14 @@ import time
 import cv2
 import numpy as np
 from cv_bridge import CvBridge
+from ultralytics import YOLO
+from pathlib import Path
+from modules import image
 
 __backup_dist = 0.33  # in metres
+
+
+
 
 def stop_backup(robot: rb):
     if robot.keyboard_listener is not None:
@@ -17,10 +23,21 @@ def stop_backup(robot: rb):
     if robot.keyboard_listener is not None:
         robot.keyboard_listener.start()
 
-def detect_stopsign(robot: rb):
-    img_msg = robot.checkImage()
-    if img_msg is not None:
-        bridge = CvBridge()
-        cv2_image = bridge.imgmsg_to_cv2(img_msg, desired_encoding='passthrough')
-        cv2.imshow("output window", cv2_image)
-        cv2.waitKey(0)
+def detect_stopsign_april(robot: rb):
+    
+    img = image.get_viewport(robot)
+    if img is not None:
+        image.display_img(img)
+        print(robot.detect_april_tag_from_img(img))
+
+def detect_stopsign_ml(robot: rb):
+    
+    img = image.get_viewport(robot)
+    if img is not None:
+        model = YOLO(Path(__file__).parent.parent / "yolov8n.pt")
+        ss, x1, x2, y1, y2 = robot.ML_predict_stop_sign(model, img)
+
+        if ss:
+            pass
+            cv2.rectangle(img, (x1,x2), (y1,y2), (0,0,255), 2) # mutates ary so don't need to assign
+            image.display_img(img)

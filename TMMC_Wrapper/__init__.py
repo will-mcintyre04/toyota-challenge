@@ -804,7 +804,7 @@ class Robot(Node):
         img_3D = np.reshape(img_data, (height, width, 3))
         return img_3D
     
-    def ML_predict_stop_sign(model, img):
+    def ML_predict_stop_sign(self, model, img):
         # height, width = image.shape[:2]
         # imgsz = (width, height)
 
@@ -816,7 +816,7 @@ class Robot(Node):
         y2 = -1
 
         # Predict stop signs in image using model
-        results = model.predict(img, classes=[11], conf=0.25, imgsz=640, max_det=1)
+        results = model.predict(img, classes=[11], conf=0.25, imgsz=640, max_det=1, verbose=False)
         
         # Results is a list containing the results object with all data
         results_obj = results[0]
@@ -827,11 +827,11 @@ class Robot(Node):
         try:
             for box in boxes:
                 x1, y1, x2, y2 = map(int, box[:4])
-                cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
+                # cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
                 stop_sign_detected = True
         except:
             stop_sign_detected = False
 
-        cv2.imshow("Bounding Box", img)
+        # cv2.imshow("Bounding Box", img)
 
         return stop_sign_detected, x1, y1, x2, y2   
