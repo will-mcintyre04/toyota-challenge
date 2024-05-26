@@ -10,12 +10,6 @@ from modules import image
 __backup_dist = 0.33  # in metres
 
 
-def stop_backup(robot: rb):
-    robot.stop_keyboard_control()
-    robot.stop(block_keyboard=False, wait=0.5)
-    robot.move_distance(-__backup_dist)
-    robot.start_keyboard_control()
-
 def detect_stopsign_april(robot: rb):
     
     img = image.get_viewport(robot)

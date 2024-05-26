@@ -43,7 +43,7 @@ import ultralytics
 from ultralytics import YOLO
 
 #---constants---
-CONST_speed_control = 1 #set this to 1 for full speed, 0.5 for half speed
+CONST_speed_control = 0.2 #set this to 1 for full speed, 0.5 for half speed
 DEBUG = False #set to false to disable terminal printing of some functions
 
 is_SIM = True #to disable some functions that can not be used on the sim
@@ -499,6 +499,9 @@ class Robot(Node):
                 self.action_map[key.char]()
         except:
             pass
+        
+    def stop(self):
+        self.send_cmd_vel(0.0, 0.0)
 
     def move_distance(self, d: float):
         vel = 1.5  # m/s
@@ -819,10 +822,8 @@ class Robot(Node):
         y2 = -1
 
         # Predict stop signs in image using model
-        print("start pred")
         results = model.predict(img, classes=[11], conf=0.25, imgsz=(img.shape[1], img.shape[0]), max_det=1, verbose=False)
-        print("done")
-
+        
         # Results is a list containing the results object with all data
         results_obj = results[0]
         
