@@ -43,10 +43,10 @@ import ultralytics
 from ultralytics import YOLO
 
 #---constants---
-CONST_speed_control = 0.2 #set this to 1 for full speed, 0.5 for half speed
+CONST_speed_control = 0.4 #set this to 1 for full speed, 0.5 for half speed
 DEBUG = False #set to false to disable terminal printing of some functions
 
-is_SIM = True #to disable some functions that can not be used on the sim
+is_SIM = False #to disable some functions that can not be used on the sim
 
 #not sure if we need , modify later, seems like an init thing
 def use_hardware():
@@ -499,12 +499,6 @@ class Robot(Node):
                 self.action_map[key.char]()
         except:
             pass
-        
-    def stop(self, wait=0.5):
-        self.stop_keyboard_control()
-        self.send_cmd_vel(0.0, 0.0)
-        time.sleep(wait)
-        self.start_keyboard_control()
 
     def move_distance(self, d: float):
         vel = 1.5  # m/s
@@ -519,14 +513,13 @@ class Robot(Node):
                 break
         self.stop()
 
-    def stop(self, block_keyboard=True, wait=1.0):
+    def stop(self, block_keyboard=True, wait=0.5):
+        if block_keyboard:
+            self.stop_keyboard_control()
+        self.send_cmd_vel(0.0, 0.0)
+        time.sleep(wait)
         if block_keyboard:
             self.start_keyboard_control()
-        self.send_cmd_vel(0.0, 0.0)
-        if wait is not None:
-            time.sleep(1.0)
-        if block_keyboard:
-            self.start_keyboard_control
 
     def move_forward(self):
         self.send_cmd_vel(1.0*CONST_speed_control, 0.0)
